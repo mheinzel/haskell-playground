@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveFunctor #-}
 
--- Generic eliminators (or catamorphisms) are a generalization of a fold
+-- catamorphisms (or generic eliminators) are a generalization of a fold
 
 -------------------------------------------------------------------------------
 -- B - BASIC
