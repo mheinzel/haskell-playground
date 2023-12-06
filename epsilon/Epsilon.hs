@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+module Epsilon where
 
 -- testing if predicates on infinite lists of Bools are
 -- -> satisfiable
@@ -9,23 +10,33 @@
 type Predicate = [Bool] -> Bool
 
 instance Eq Predicate where
-    p == q = forall $ \xs -> p xs == q xs
+    p == q = tautology $ \xs -> p xs == q xs
 
-forall :: Predicate -> Bool
-forall p = p $ epsilon (not . p)
+tautology :: Predicate -> Bool
+tautology p = p $ searcher (not . p)
 
-exists :: Predicate -> Maybe a
-exists p = if p xs then Just xs else Nothing
+find :: Predicate -> Maybe [Bool]
+find p = if p xs then Just xs else Nothing
   where
-    xs = epsilon p
+    xs = searcher p
 
 -- the core of the program:
 -- returns a list satisfying the predicate, if any exists
 -- returns any infinite list otherwise
-epsilon :: Predicate -> [Bool]
-epsilon p = b : epsilon (p . (b:))
+searcher :: ([Bool] -> Bool) -> [Bool]
+searcher p = b : searcher (p . (b :))
   where
     -- the b only has to be evaluated for the elements that are actually tested
     -- True, if we can find a valid list with True as first element
     -- False otherwise (either there is a valid list starting with False, or we don't care)
-    b = p (True : epsilon (p . (True:)))
+    b = p (True : searcher (p . (True :)))
+
+--}
+
+{-
+searcher :: Predicate -> [Bool]
+searcher p =
+  if p (True : searcher (p . (True:)))
+    then True  : searcher (p . (True  :))
+    else False : searcher (p . (False :))
+--}
